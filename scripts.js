@@ -3,45 +3,28 @@ const buttons = document.querySelectorAll('#game button');
 
 // Attach click event listeners to each button, calling the playGame function
 buttons.forEach(button => {
-    button.addEventListener('click', playGame);
+    button.addEventListener('click', playRound);
 });
 
 let playerScore = 0;
 let computerScore = 0;
-let round = 1;
+
+const resultDiv = document.createElement('div');
+resultDiv.classList.add('result');
+document.body.appendChild(resultDiv);
 
 // Function called when a button is clicked
-function playGame(e) {
-    // Get the player's choice based on the clicked button's id
-    const playerChoice = e.target.id;
-
-    // Generate a random choice for the computer
-    const computerChoice = getComputerChoice();
-
-    // Get the result of the round (tie, win, or computer win)
-    const result = playRound(playerChoice, computerChoice);
-
-    // Display the result of the round
-    displayResult(playerChoice, computerChoice, result);
+function playRound(e) {
+    const playerSelection = e.target.id;
+    const computerSelection = getComputerChoice();
+    const result = getResult(playerSelection, computerSelection);
+    displayResult(playerSelection, computerSelection, result);
 
     // Update the scores based on the round result
     updateScore(result);
 
-    // Check if it's the last round (5 rounds)
-    if (round === 5) {
-        // Display the final result after 5 rounds
-        displayFinalResult();
-
-        // Ask if the user wants to play again
-        const playAgain = confirm("Do you want to play again?");
-        if (playAgain) {
-            // Reset scores and start a new game
-            resetScores();
-            startNewGame();
-        }
-    } else {
-        // Increment the round number for the next round
-        round++;
+    if (playerScore === 5 || computerScore ===5) {
+        endGame();
     }
 }
 
@@ -49,27 +32,30 @@ function playGame(e) {
 function getComputerChoice() {
     const choices = ["rock", "paper", "scissors"];
     const randomIndex = Math.floor(Math.random() * choices.length);
-    return choices[randomIndex]; // Return a random choice for the computer
+    return choices[randomIndex]; 
 }
 
 // Function to determine the result of a round
-function playRound(playerSelection, computerSelection) {
-    if (playerSelection === computerSelection) {
-        return "It's a tie!"; // Return if it's a tie
+function getResult(playerChoice, computerChoice) {
+    if (playerChoice === computerChoice) {
+        return "It's a tie!";
     } else if (
-        (playerSelection === "rock" && computerSelection === "scissors") ||
-        (playerSelection === "paper" && computerSelection === "rock") ||
-        (playerSelection === "scissors" && computerSelection === "paper")
+        (playerChoice === "rock" && computerChoice === "scissors") ||
+        (playerChoice === "paper" && computerChoice === "rock") ||
+        (playerChoice === "scissors" && computerChoice === "paper")
     ) {
-        return "You win!"; // Return if the player wins
+        return "You win!";
     } else {
-        return "Computer wins!"; // Return if the computer wins
+        return "Computer wins!";
     }
 }
 
 // Function to display the result of a round
 function displayResult(playerChoice, computerChoice, result) {
-    console.log(`Round ${round}: You chose ${playerChoice}. Computer chose ${computerChoice}. ${result}`);
+    const message = `You chose ${playerChoice}. Computer chose ${computerChoice}. ${result}`;
+    const roundResult = document.createElement('p');
+    roundResult.textContent = message;
+    resultDiv.appendChild(roundResult);
 }
 
 // Function to update the scores based on the result of a round
@@ -79,30 +65,30 @@ function updateScore(result) {
     } else if (result === "Computer wins!") {
         computerScore++;
     }
+
+    const scoreMessage = `Score: You ${playerScore} - Computer ${computerScore}`;
+    const scoreDisplay = document.createElement('p');
+    scoreDisplay.textContent = scoreMessage;
+    resultDiv.appendChild(scoreDisplay);
 }
 
-// Function to display the final result after 5 rounds
-function displayFinalResult() {
-    console.log(`Final Score: You ${playerScore} - Computer ${computerScore}`);
-
-    if (playerScore > computerScore) {
-        console.log("Congratulations! You win the game!");
-    } else if (playerScore < computerScore) {
-        console.log("Oops! Computer wins the game!");
+// Function to display the final result
+function endGame() {
+    let winner;
+    if (playerScore === 5){
+        winner = 'You';
     } else {
-        console.log("It's a tie! The game ends in a draw.");
+        winner = 'Computer';
     }
-}
 
-// Function to reset the scores
-function resetScores() {
-    playerScore = 0;
-    computerScore = 0;
-    round = 1;
-}
+    const endMessage = `${winner} wins the game!`;
+    const endDisplay = document.createElement('p');
+    endDisplay.textContent = endMessage;
+    resultDiv.appendChild(endDisplay);
 
-// Function to start a new game
-function startNewGame() {
-    console.log("Starting a new game...");
-    // Any additional setup or logic for starting a new game can be added here
+    // Disable the buttons afer the game ends
+    button.forEach(button => {
+        button.removeEventListener('click', playRound);
+        button.disabled = true;
+    });
 }
