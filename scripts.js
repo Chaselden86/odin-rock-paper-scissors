@@ -15,6 +15,9 @@ document.body.appendChild(resultDiv);
 
 // Function called when a button is clicked
 function playRound(e) {
+if (playerScore === 5 || computerScore === 5) {
+    return; // Exit early if the game has already ended
+}
     const playerSelection = e.target.id;
     const computerSelection = getComputerChoice();
     const result = getResult(playerSelection, computerSelection);
