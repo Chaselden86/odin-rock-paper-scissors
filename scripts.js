@@ -87,7 +87,7 @@ function endGame() {
     resultDiv.appendChild(endDisplay);
 
     // Disable the buttons afer the game ends
-    button.forEach(button => {
+    buttons.forEach(button => {
         button.removeEventListener('click', playRound);
         button.disabled = true;
     });
