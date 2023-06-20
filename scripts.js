@@ -16,12 +16,13 @@ document.body.appendChild(resultDiv);
 // Function called when a button is clicked
 function playRound(e) {
 if (playerScore === 5 || computerScore === 5) {
-    return; // Exit early if the game has already ended
+    return;
 }
     const playerSelection = e.target.id;
     const computerSelection = getComputerChoice();
     const result = getResult(playerSelection, computerSelection);
-    displayResult(playerSelection, computerSelection, result);
+    currentRound++;
+    displayResult(playerSelection, computerSelection, result, currentRound);
 
     // Update the scores based on the round result
     updateScore(result);
@@ -54,8 +55,8 @@ function getResult(playerChoice, computerChoice) {
 }
 
 // Function to display the result of a round
-function displayResult(playerChoice, computerChoice, result) {
-    const message = `You chose ${playerChoice}. Computer chose ${computerChoice}. ${result}`;
+function displayResult(playerChoice, computerChoice, result, round) {
+    const message = `Round ${round}: You chose ${playerChoice}. Computer chose ${computerChoice}. ${result}`;
     const roundResult = document.createElement('p');
     roundResult.textContent = message;
     resultDiv.appendChild(roundResult);
@@ -79,7 +80,7 @@ function updateScore(result) {
 function endGame() {
     let winner;
     if (playerScore === 5){
-        winner = 'You';
+        winner = 'Player';
     } else {
         winner = 'Computer';
     }
@@ -89,9 +90,26 @@ function endGame() {
     endDisplay.textContent = endMessage;
     resultDiv.appendChild(endDisplay);
 
+    const playAgainButton = document.createElement('button');
+    playAgainButton.textContent = 'Play Again';
+    playAgainButton.addEventListener('click', resetGame);
+    resultDiv.appendChild(playAgainButton);
+
     // Disable the buttons afer the game ends
     buttons.forEach(button => {
         button.removeEventListener('click', playRound);
         button.disabled = true;
     });
 }
+
+function resetGame() {
+    playerScore = 0;
+    computerScore = 0;
+    currentRound = 0;
+    resultDiv.innerHTML = ''; // Clear the result container
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', playRound);
+      button.disabled = false;
+    });
+  }
